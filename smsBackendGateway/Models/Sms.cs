@@ -1,7 +1,4 @@
-﻿using static System.Net.Mime.MediaTypeNames;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Reflection;
-
+﻿
 namespace smsBackendGateway.Models
 {
     public class Sms
@@ -30,6 +27,4 @@ namespace smsBackendGateway.Models
             this.phoneNumber = phoneNumber;
         }
     }
-
-  
 }

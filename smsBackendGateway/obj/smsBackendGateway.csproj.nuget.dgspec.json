@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Chasey.Elizarde\\source\\repos\\smsBackendGateway\\smsBackendGateway\\smsBackendGateway.csproj": {}
+    "C:\\Users\\Chasey.Elizarde\\source\\repos\\sms-backend-gateway\\smsBackendGateway\\smsBackendGateway.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Chasey.Elizarde\\source\\repos\\smsBackendGateway\\smsBackendGateway\\smsBackendGateway.csproj": {
+    "C:\\Users\\Chasey.Elizarde\\source\\repos\\sms-backend-gateway\\smsBackendGateway\\smsBackendGateway.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Chasey.Elizarde\\source\\repos\\smsBackendGateway\\smsBackendGateway\\smsBackendGateway.csproj",
+        "projectUniqueName": "C:\\Users\\Chasey.Elizarde\\source\\repos\\sms-backend-gateway\\smsBackendGateway\\smsBackendGateway.csproj",
         "projectName": "smsBackendGateway",
-        "projectPath": "C:\\Users\\Chasey.Elizarde\\source\\repos\\smsBackendGateway\\smsBackendGateway\\smsBackendGateway.csproj",
+        "projectPath": "C:\\Users\\Chasey.Elizarde\\source\\repos\\sms-backend-gateway\\smsBackendGateway\\smsBackendGateway.csproj",
         "packagesPath": "C:\\Users\\Chasey.Elizarde\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Chasey.Elizarde\\source\\repos\\smsBackendGateway\\smsBackendGateway\\obj\\",
+        "outputPath": "C:\\Users\\Chasey.Elizarde\\source\\repos\\sms-backend-gateway\\smsBackendGateway\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

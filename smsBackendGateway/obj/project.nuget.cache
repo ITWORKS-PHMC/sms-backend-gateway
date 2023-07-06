@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "vZVGn1Xc7zZ1fnVvWafqvu+c5TFu/k8N3UsAmgp5ofWZDa9O71/JzvmulUWTtF0Xv3zi5NwHmeb5wsxNOq7lZw==",
+  "dgSpecHash": "BoBTikfKWR126Nghx5fLELGayrDdW1/BqmtVZeF3EL4eSU85nutnWC6uG0rUlLLH5okWIMs6ylm1wjs2xPSU7w==",
   "success": true,
-  "projectFilePath": "C:\\Users\\Chasey.Elizarde\\source\\repos\\smsBackendGateway\\smsBackendGateway\\smsBackendGateway.csproj",
+  "projectFilePath": "C:\\Users\\Chasey.Elizarde\\source\\repos\\sms-backend-gateway\\smsBackendGateway\\smsBackendGateway.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Chasey.Elizarde\\.nuget\\packages\\azure.core\\1.24.0\\azure.core.1.24.0.nupkg.sha512",
     "C:\\Users\\Chasey.Elizarde\\.nuget\\packages\\azure.identity\\1.6.0\\azure.identity.1.6.0.nupkg.sha512",

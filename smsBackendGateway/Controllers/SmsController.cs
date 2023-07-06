@@ -12,6 +12,12 @@ using NuGet.Protocol.Plugins;
 using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
+using Microsoft.VisualBasic;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+
+
+//using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+//using Newtonsoft.Json;
 
 namespace smsBackendGateway.Controllers
 {
@@ -38,6 +44,46 @@ namespace smsBackendGateway.Controllers
             this.serialport.RtsEnable = true;
             this.serialport.NewLine = System.Environment.NewLine;
         }
+
+        //[HttpGet]
+        //[Route("Insert")]
+        //public async Task<ActionResult<IEnumerable<SmsSent>>> GetSmsSent()
+        //{
+          
+        //        if (_dbContext.sms == null)
+        //        {
+        //            return NotFound();
+        //        }
+        //        //return await _dbContext.sms.ToListAsync();
+        //        return Ok();
+        //}
+
+        //[HttpGet]
+        //[Route("Insert2")]
+        //public async Task<ActionResult<SmsSent>> GetSms(int id)
+        //{
+        //    if (_dbContext.sms == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    var contact_id = await _dbContext.sms.FindAsync(id);
+        //    if (contact_id == null)
+        //    {
+        //        return NotFound();
+        //    }
+        //    return contact_id;
+        //}
+
+        //[HttpPost]
+        //[Route("Insert3")]
+        //public async Task<ActionResult<SmsSent>> PostSms(SmsSent )
+        //{
+        //    _dbContext.sms.Add(sms);
+
+        //    await _dbContext.SaveChangesAsync();
+        //    return CreatedAtAction(nameof(GetSms), new { id = sms.messageId }, sms);
+
+        //}
 
         private List<Sms> ParseSmsMessages(string response)
         {
@@ -232,5 +278,115 @@ namespace smsBackendGateway.Controllers
 
         }
 
+        [HttpGet]
+        [Route("QueueMessages")]
+        public string Queue()
+        {
+            string connectionString = "Data Source=uphmc-dc33; Initial Catalog=ITWorksSMS; TrustServerCertificate=True; User ID=dalta; Password=dontshareit";
+
+            List<Dictionary<string, string>> rows = new List<Dictionary<string, string>>();
+            Dictionary<string, string> column;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                //Will trigger back end and check queue
+                //will store queue in server queue (use queue datatype)
+                //send message one by one 
+                //after sending check queue again 
+                //repeat for queuing
+                
+                try
+                {
+                    // Open the connection
+                    SqlCommand command = new SqlCommand("SELECT * FROM sms_queue", connection);
+                    connection.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            column = new Dictionary<string, string>();
+
+                            column["contact_id"] = reader["contact_id"].ToString();
+                            column["mobile_no"] = reader["mobile_no"].ToString();
+                            column["sms_message"] = reader["sms_message"].ToString();
+                            
+                            //Place the dictionary into the list
+                            rows.Add(column); 
+                        }
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    // Handle any errors that occurred during the connection process
+                    Console.WriteLine("An error occurred while connecting to the database: " + ex.Message);
+                }
+                finally
+                {
+                    // Close the connection
+                    connection.Close();
+                }
+            }
+            return JsonSerializer.Serialize(rows);
+        }
+
+        [HttpGet]
+        [Route("TestDateTime")]
+        public IEnumerable<SmsSent> Get()
+        {
+            return Enumerable.Range(1, 10).Select(index => new SmsSent
+            {
+                //Date = DateOnly.FromDateTime(DateTime.Now.AddDays(index)) //continuous date 
+                //Date = DateOnly.FromDateTime(DateTime.Now) //date today
+                date_created = DateTime.Now //for date and time 
+            })
+            .ToArray();
+        }
+
+        [HttpGet]
+        [Route("SelectContacts")]
+        public string Test()
+        {
+            string connectionString = "Data Source=uphmc-dc33; Initial Catalog=ITWorksSMS; TrustServerCertificate=True; User ID=dalta; Password=dontshareit";
+
+            List<Dictionary<string, string>> rows = new List<Dictionary<string, string>>();
+            Dictionary<string, string> column;
+
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    // Open the connection
+                    SqlCommand command = new SqlCommand("SELECT * FROM contacts", connection);
+                    connection.Open();
+
+                    using (SqlDataReader reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            column = new Dictionary<string, string>();
+
+                            column["employee_no"] = reader["employee_no"].ToString();
+                            column["contact_lname"] = reader["contact_lname"].ToString();
+                            column["contact_fname"] = reader["contact_fname"].ToString();
+
+                            rows.Add(column); //Place the dictionary into the list
+                        }
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    // Handle any errors that occurred during the connection process
+                    Console.WriteLine("An error occurred while connecting to the database: " + ex.Message);
+                }
+                finally
+                {
+                    // Close the connection
+                    connection.Close();
+                }
+            }
+
+            return JsonSerializer.Serialize(rows);
+        }
     }
 }
