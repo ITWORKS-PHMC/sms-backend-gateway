@@ -6,15 +6,14 @@ namespace smsBackendGateway.Models
         //public int contact_id { get; set; }
         public string[] numbers { get; set; }
         public string message { get; set; }
-        public DateOnly Date { get; set; }
 
-        public SmsQueue(string[] numbers, string message, DateOnly date)
+        //public DateOnly Date { get; set; }
+        public DateTime date_created { get; set; }
+
+        public SmsQueue(string[] numbers, string message)
         {
             this.numbers = numbers;
             this.message = message; 
-            this.Date = date;
-
-       
         }
 
         public SmsQueue(){}

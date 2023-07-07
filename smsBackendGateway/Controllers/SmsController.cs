@@ -16,8 +16,6 @@ using Microsoft.VisualBasic;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 
-//using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-//using Newtonsoft.Json;
 
 namespace smsBackendGateway.Controllers
 {
@@ -44,46 +42,6 @@ namespace smsBackendGateway.Controllers
             this.serialport.RtsEnable = true;
             this.serialport.NewLine = System.Environment.NewLine;
         }
-
-        //[HttpGet]
-        //[Route("Insert")]
-        //public async Task<ActionResult<IEnumerable<SmsSent>>> GetSmsSent()
-        //{
-          
-        //        if (_dbContext.sms == null)
-        //        {
-        //            return NotFound();
-        //        }
-        //        //return await _dbContext.sms.ToListAsync();
-        //        return Ok();
-        //}
-
-        //[HttpGet]
-        //[Route("Insert2")]
-        //public async Task<ActionResult<SmsSent>> GetSms(int id)
-        //{
-        //    if (_dbContext.sms == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    var contact_id = await _dbContext.sms.FindAsync(id);
-        //    if (contact_id == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    return contact_id;
-        //}
-
-        //[HttpPost]
-        //[Route("Insert3")]
-        //public async Task<ActionResult<SmsSent>> PostSms(SmsSent )
-        //{
-        //    _dbContext.sms.Add(sms);
-
-        //    await _dbContext.SaveChangesAsync();
-        //    return CreatedAtAction(nameof(GetSms), new { id = sms.messageId }, sms);
-
-        //}
 
         private List<Sms> ParseSmsMessages(string response)
         {
@@ -278,9 +236,84 @@ namespace smsBackendGateway.Controllers
 
         }
 
+        [HttpPost]
+        [Route("TriggerSend")]
+        public string TriggerSend()
+        {
+            List<Dictionary<string, string>> queueMessages = GetQueue();
+            System.Diagnostics.Debug.WriteLine(queueMessages);
+
+            foreach (Dictionary<string, string> message in queueMessages)
+            {
+                try
+                {
+                    atSend(message["mobile_no"], message["sms_message"]);
+
+                    System.Diagnostics.Debug.WriteLine("Message sent " + message["sms_message"] + " to " + message["mobile_no"]);
+
+                    try
+                    {
+                        string connectionString = "Data Source=uphmc-dc33; Initial Catalog=ITWorksSMS; TrustServerCertificate=True; User ID=dalta; Password=dontshareit";
+
+                        SqlConnection connection = new SqlConnection(connectionString);
+                        
+                        // Open the connection
+                        connection.Open();
+
+                        SqlCommand command;
+                        SqlDataAdapter adapter = new SqlDataAdapter();
+
+                        command = connection.CreateCommand();
+
+                        String sql = "DELETE FROM sms_queue WHERE sms_id='" + message["sms_id"] + "';\n";
+                        sql += "INSERT INTO sms_sent (sms_id, contact_id, mobile_no, sms_message) VALUES (" + message["sms_id"] + ", 0, '" + message["mobile_no"] + "', '"+ message["sms_message"] + "');";
+
+                        command = new SqlCommand(sql, connection);
+                        adapter.InsertCommand = new SqlCommand(sql, connection);
+                        adapter.InsertCommand.ExecuteNonQuery();
+
+                        // Close the connection
+                        connection.Close();
+                    }
+                    catch (SqlException ex)
+                    {
+                        // Handle any errors that occurred during the connection process
+                        Console.WriteLine("An error occurred while connecting to the database: " + ex.Message);
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine(e);
+                }
+
+            }
+
+            return "200";
+        }
+
+        private void atSend(string number, string message) {
+            serialport.Open();
+            serialport.WriteLine(@"AT" + (char)(13));
+            Thread.Sleep(1000);
+
+            serialport.WriteLine("AT+CMGF=1\r");
+            Thread.Sleep(1000);
+
+            serialport.WriteLine("AT+CMGS=\"" + number + "\"\r\n");
+            Thread.Sleep(1000);
+
+            serialport.WriteLine(message + "\x1A");
+            Thread.Sleep(1000);
+
+            string response = serialport.ReadExisting();
+
+            serialport.Close();
+        }
+
         [HttpGet]
-        [Route("QueueMessages")]
-        public string Queue()
+        [Route("SelectQueueMessages")]
+        private List<Dictionary<string, string>> GetQueue()
         {
             string connectionString = "Data Source=uphmc-dc33; Initial Catalog=ITWorksSMS; TrustServerCertificate=True; User ID=dalta; Password=dontshareit";
 
@@ -289,12 +322,6 @@ namespace smsBackendGateway.Controllers
 
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                //Will trigger back end and check queue
-                //will store queue in server queue (use queue datatype)
-                //send message one by one 
-                //after sending check queue again 
-                //repeat for queuing
-                
                 try
                 {
                     // Open the connection
@@ -307,6 +334,7 @@ namespace smsBackendGateway.Controllers
                         {
                             column = new Dictionary<string, string>();
 
+                            column["sms_id"] = reader["sms_id"].ToString();
                             column["contact_id"] = reader["contact_id"].ToString();
                             column["mobile_no"] = reader["mobile_no"].ToString();
                             column["sms_message"] = reader["sms_message"].ToString();
@@ -327,7 +355,8 @@ namespace smsBackendGateway.Controllers
                     connection.Close();
                 }
             }
-            return JsonSerializer.Serialize(rows);
+
+            return rows;
         }
 
         [HttpGet]
